@@ -7,7 +7,8 @@ require_once(__DIR__ . '/../../vendor/autoload.php');
 
 //Require Required Classes
 use PhpAmqpLib\Connection\AMQPStreamConnection;
-use PhpAmqpLib\Message\AMQPMessage;
+use Elasticsearch\ClientBuilder;
+
 $log = new log();
 $general = new general();
 
@@ -30,7 +31,40 @@ $callback = function($msg) {
         
     //Transform msg body in array to send elastic search
     $data = (array) json_decode($msg->body);    
-    print_r($data);
+    
+    //Define host connection - ELASTIC SEARCH
+    $hosts = [
+         // This is effectively equal to: "https://username:password!#$?*abc@foo.com:9200/"
+         [
+             'host' => ELASTICSEARCH_HOST,
+             'port' => ELASTICSEARCH_PORT,
+             'scheme' => ELASTICSEARCH_SCHEME
+         ]
+     ];
+    
+    $log->logar("Insert Transaction: ".$data['TRANSACTION_ID']." ".print_r($data,true),"insert-transaction/");
+
+    //Connect to Elastic Search
+    try {    
+
+        $client = ClientBuilder::create()       // Instantiate a new ClientBuilder
+                        ->setHosts($hosts)      // Set the hosts
+                        ->build();              // Build the client object
+
+        //Define params to send elastic search
+        $params = [
+            'index' => 'transaction',
+            'type' => 'transaction',
+            'id' => $data['TRANSACTION_ID'], //enviar order id
+            'body' => $data
+        ];
+
+        $response = $client->index($params);
+        $log->logar(print_r($response,true),"insert-transaction-elasticsearch/");
+
+    } catch (Exception $e) {    
+        $log->logar(print_r($e,true),"insert-transaction-elasticsearch/");   
+    }    
         
     echo " [x] Done", "\n";
     $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']);

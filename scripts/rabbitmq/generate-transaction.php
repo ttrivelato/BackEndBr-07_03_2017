@@ -18,32 +18,43 @@ $channel = $connection->channel();
 //Define RabbitMQ QUEUE
 $channel->queue_declare('generate-transaction', false, true, false, false);
 
-//Sent Data to QUEUE - Create - Capturate DATA to insert in elasticsearch
-$data = array();
-$data['MERCHANT_ID'] = (int)rand(10,10000);
-$data['TRANSACTION_ID'] = (int)rand(10,10000000);
-$data['ORDER_ID'] = $general->randomString(20);
-$data['REFERENCE_NUMBER'] = $general->randomString(10);
-$data['TRANSACTION_DATE'] = date('Y-m-d H:i:s');
-$data['TRANSACTION_TYPE'] = (int)rand(0,10);
-$data['TRANSACTION_STATE'] = (int)rand(0,10);;
-$data['TRANSACTION_AMOUNT'] = (float)$general->randomFloat(10, 5000);
-$data['INSTALLMENTS'] = (int)rand(0,10);;
-$data['CREDIT_CARD_TYPE'] = (int)rand(0,10);;
-$data['AUTH_CODE'] = $general->randomString(6);
-$data['RESPONSE_CODE'] = $general->randomString(2);
-$data['NSU'] = $general->randomString(6);
-$data['GATEWAY_TRANSACTION_ID'] = $general->randomString(20);;
-$data['CURRENCY_CODE'] = 'BRL';
-$data['GATEWAY_CODE'] = $general->randomString(2);;
-$data['GATEWAY_MESSAGE'] = $general->randomString(20);;
-$data['RECURRING_PAYMENT'] = (int)0;
-$data['GATEWAY_REFERENCE_NUMBER'] = $general->randomString(6);
+$i = 1;
+$t = 100;
+//Generate Transactions Example
+while ($i <= $t) {
+    
+    $i++;
 
-$dataJson = json_encode($data);
-$msg = new AMQPMessage($dataJson, array('delivery_mode' => 2));
-$channel->basic_publish($msg, '', 'generate-transaction');
-echo " [x] Sent ", $dataJson, "\n";
+    //Sent Data to QUEUE - Create - Capturate DATA to insert in elasticsearch
+    $data = array();
+    $data['MERCHANT_ID'] = (int)rand(10,10000);
+    $data['TRANSACTION_ID'] = (int)rand(10,10000000);
+    $data['ORDER_ID'] = $general->randomString(20);
+    $data['REFERENCE_NUMBER'] = $general->randomString(10);
+    $data['TRANSACTION_DATE'] = date('Y-m-d H:i:s');
+    $data['TRANSACTION_TYPE'] = (int)rand(0,10);
+    $data['TRANSACTION_STATE'] = (int)rand(0,10);;
+    $data['TRANSACTION_AMOUNT'] = (float)$general->randomFloat(10, 5000);
+    $data['INSTALLMENTS'] = (int)rand(0,10);;
+    $data['CREDIT_CARD_TYPE'] = (int)rand(0,10);;
+    $data['AUTH_CODE'] = $general->randomString(6);
+    $data['RESPONSE_CODE'] = $general->randomString(2);
+    $data['NSU'] = $general->randomString(6);
+    $data['GATEWAY_TRANSACTION_ID'] = $general->randomString(20);;
+    $data['CURRENCY_CODE'] = 'BRL';
+    $data['GATEWAY_CODE'] = $general->randomString(2);;
+    $data['GATEWAY_MESSAGE'] = $general->randomString(20);;
+    $data['RECURRING_PAYMENT'] = (int)0;
+    $data['GATEWAY_REFERENCE_NUMBER'] = $general->randomString(6);
+
+    $dataJson = json_encode($data);
+    $msg = new AMQPMessage($dataJson, array('delivery_mode' => 2));
+    $channel->basic_publish($msg, '', 'generate-transaction');
+    echo " [x] Sent ", $dataJson, "\n";
+    
+    $log->logar("Insert Transaction: ".$data['TRANSACTION_ID']." ".print_r($data,true),"generate-transaction/");
+
+}
 
 $channel->close();
 $connection->close();
