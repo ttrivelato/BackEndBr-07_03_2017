@@ -9,7 +9,6 @@ require_once(__DIR__ . '/../../vendor/autoload.php');
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use Elasticsearch\ClientBuilder;
 
-$log = new log();
 $general = new general();
 
 //Connect to RabbitMQ
@@ -24,6 +23,8 @@ echo ' [*] Waiting for messages. To exit press CTRL+C', "\n";
 
 //Instance RABBITMQ Queue
 $callback = function($msg) {
+
+    $log = new log();
     
     //Show in screen Data Received
     echo " [x] Received ", $msg->body, "\n";
