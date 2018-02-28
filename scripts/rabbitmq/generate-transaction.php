@@ -23,6 +23,10 @@ $t = 100;
 //Generate Transactions Example
 while ($i <= $t) {
     
+    //Create - Capturate DATA to insert in elasticsearch
+    $dt = new DateTime();
+    $dt->setTimeZone(new DateTimeZone('America/Sao_Paulo'));
+    
     $i++;
 
     //Sent Data to QUEUE - Create - Capturate DATA to insert in elasticsearch
@@ -31,7 +35,7 @@ while ($i <= $t) {
     $data['TRANSACTION_ID'] = (int)rand(10,10000000);
     $data['ORDER_ID'] = $general->randomString(20);
     $data['REFERENCE_NUMBER'] = $general->randomString(10);
-    $data['TRANSACTION_DATE'] = date('Y-m-d H:i:s');
+    $data['TRANSACTION_DATE'] = $dt->format('Y-m-d\TH:i:s.\0\0\0\Z');
     $data['TRANSACTION_TYPE'] = (int)rand(0,10);
     $data['TRANSACTION_STATE'] = (int)rand(0,10);;
     $data['TRANSACTION_AMOUNT'] = (float)$general->randomFloat(10, 5000);

@@ -22,12 +22,15 @@ $hosts = [
  ];
 
 //Create - Capturate DATA to insert in elasticsearch
+$dt = new DateTime();
+$dt->setTimeZone(new DateTimeZone('America/Sao_Paulo'));
+
 $data = array();
 $data['MERCHANT_ID'] = (int)23859;
 $data['TRANSACTION_ID'] = (int)165615714;
 $data['ORDER_ID'] = '0A011599:015A40C913B3:7068:339CC618';
 $data['REFERENCE_NUMBER'] = '1707GBDyq4Ys';
-$data['TRANSACTION_DATE'] = date('Y-m-d H:i:s');
+$data['TRANSACTION_DATE'] = $dt->format('Y-m-d\TH:i:s.\0\0\0\Z');
 $data['TRANSACTION_TYPE'] = (int)0;
 $data['TRANSACTION_STATE'] = (int)1;
 $data['TRANSACTION_AMOUNT'] = (float)'70.50';
